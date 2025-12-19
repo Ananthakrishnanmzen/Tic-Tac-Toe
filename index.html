@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unbeatable Tic-Tac-Toe</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container" id="setup-screen">
+        <h1 class="title">Tic-Tac-Toe</h1>
+        <p class="subtitle">Challenge the unbeatable AI</p>
+        <div class="card main-card">
+            <h3>Choose your symbol</h3>
+            <div class="symbol-selection">
+                <div class="symbol-box" onclick="initGame('X')">
+                    <span class="x-text">X</span>
+                    <small>Goes first</small>
+                </div>
+                <div class="symbol-box" onclick="initGame('O')">
+                    <span class="o-text">O</span>
+                    <small>Goes second</small>
+                </div>
+            </div>
+        </div>
+        <p class="warning">Warning: The AI uses the minimax algorithm and cannot be beaten!</p>
+    </div>
+
+    <div class="container hidden" id="game-screen">
+        <h1 class="title">Tic-Tac-Toe</h1>
+        <p class="subtitle">You are playing as <span id="player-display" class="x-text">X</span></p>
+
+        <div class="score-board">
+            <div class="score-item"><span>YOU</span><strong id="user-score">0</strong></div>
+            <div class="score-item"><span>DRAWS</span><strong id="draw-score">0</strong></div>
+            <div class="score-item"><span>AI</span><strong id="ai-score">0</strong></div>
+        </div>
+
+        <div class="turn-indicator">
+            <span id="turn-icon" class="x-text">X</span> <span id="turn-text">Your turn</span>
+        </div>
+
+        <div class="board" id="board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+        </div>
+
+        <button class="btn-text" onclick="resetToMenu()">Change symbol</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
