@@ -1,1 +1,89 @@
+:root {
+    --bg-color: #0d0e1b;
+    --card-bg: #161a2e;
+    --x-color: #4ed9ff;
+    --o-color: #ff8159;
+    --text-dim: #7b819a;
+}
+
+body {
+    background: radial-gradient(circle at center, #1e213a 0%, var(--bg-color) 100%);
+    color: white;
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container { text-align: center; width: 320px; }
+.hidden { display: none; }
+
+/* Typography */
+.title { font-size: 2rem; margin-bottom: 5px; }
+.subtitle { color: var(--text-dim); margin-bottom: 30px; font-size: 0.9rem; }
+.x-text { color: var(--x-color); text-shadow: 0 0 10px var(--x-color); }
+.o-text { color: var(--o-color); text-shadow: 0 0 10px var(--o-color); }
+
+/* Selection Screen */
+.card {
+    background: var(--card-bg);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.symbol-selection { display: flex; gap: 15px; margin-top: 20px; }
+.symbol-box {
+    flex: 1;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 20px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.symbol-box span { font-size: 2.5rem; font-weight: bold; display: block; }
+.symbol-box small { color: var(--text-dim); font-size: 0.7rem; }
+.warning { color: var(--text-dim); font-size: 0.75rem; margin-top: 30px; line-height: 1.4; }
+
+/* Game Screen */
+.score-board {
+    display: flex;
+    background: var(--card-bg);
+    border-radius: 15px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+.score-item { flex: 1; display: flex; flex-direction: column; font-size: 0.8rem; }
+.score-item span { color: var(--text-dim); margin-bottom: 5px; }
+
+.turn-indicator {
+    background: var(--card-bg);
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 20px;
+}
+.cell {
+    aspect-ratio: 1;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+.btn-text { background: none; border: none; color: var(--text-dim); margin-top: 20px; cursor: pointer; }
 
