@@ -1,9 +1,12 @@
 let board = ["", "", "", "", "", "", "", "", ""];
 let player = "X";
 let ai = "O";
+let isAiThinking = false;
 let scores = { user: 0, draw: 0, ai: 0 };
 
 const cells = document.querySelectorAll('.cell');
+const boardEl = document.getElementById('board');
+const line = document.getElementById('strike-line');
 
 function initGame(symbol) {
     player = symbol;
@@ -16,28 +19,45 @@ function initGame(symbol) {
 
 function resetBoard() {
     board = ["", "", "", "", "", "", "", "", ""];
-    cells.forEach(cell => { cell.innerText = ""; cell.className = "cell"; });
+    isAiThinking = false;
+    line.style.display = 'none';
+    boardEl.classList.remove('locked');
+    cells.forEach(cell => { 
+        cell.innerText = ""; 
+        cell.className = "cell"; 
+    });
+    
     updateTurnUI(true);
-    if (ai === "X") setTimeout(aiMove, 500);
+    if (ai === "X") {
+        isAiThinking = true;
+        boardEl.classList.add('locked');
+        // Reduced delay for the first move
+        setTimeout(aiMove, 100); 
+    }
 }
 
-function updateTurnUI(isPlayer) {
+function updateTurnUI(isPlayerTurn) {
     const icon = document.getElementById('turn-icon');
     const text = document.getElementById('turn-text');
-    const active = isPlayer ? player : ai;
-    icon.innerText = active;
-    icon.className = active === 'X' ? 'x-text' : 'o-text';
-    text.innerText = isPlayer ? "Your turn" : "AI thinking...";
+    const symbol = isPlayerTurn ? player : ai;
+    icon.innerText = symbol;
+    icon.className = symbol === 'X' ? 'x-text' : 'o-text';
+    text.innerText = isPlayerTurn ? "Your turn" : "AI thinking...";
 }
 
 cells.forEach(cell => {
     cell.addEventListener('click', (e) => {
         const index = e.target.dataset.index;
-        if (board[index] === "" && !checkWinner(board)) {
+        if (board[index] === "" && !isAiThinking) {
             makeMove(index, player);
-            if (!checkWinner(board) && board.includes("")) {
+            
+            let result = checkWinner(board);
+            if (!result && board.includes("")) {
+                isAiThinking = true; 
+                boardEl.classList.add('locked');
                 updateTurnUI(false);
-                setTimeout(aiMove, 600);
+                // SPEED FIX: Reduced from 600ms to 50ms for instant feel
+                setTimeout(aiMove, 50); 
             }
         }
     });
@@ -49,7 +69,12 @@ function makeMove(index, symbol) {
     cells[index].classList.add(symbol === 'X' ? 'x-text' : 'o-text');
     
     let result = checkWinner(board);
-    if (result) endGame(result);
+    if (result) {
+        if (result.winner !== "draw") {
+            drawWinningLine(result.combo);
+        }
+        endGame(result.winner);
+    }
 }
 
 function aiMove() {
@@ -67,14 +92,21 @@ function aiMove() {
         }
     }
     makeMove(move, ai);
-    updateTurnUI(true);
+    if (!checkWinner(board)) {
+        isAiThinking = false;
+        boardEl.classList.remove('locked');
+        updateTurnUI(true);
+    }
 }
 
+// OPTIMIZED MINIMAX
 function minimax(board, depth, isMaximizing) {
     let result = checkWinner(board);
-    if (result === ai) return 10;
-    if (result === player) return -10;
-    if (result === "draw") return 0;
+    if (result) {
+        if (result.winner === ai) return 10 - depth; // Favor faster wins
+        if (result.winner === player) return depth - 10; // Favor longer losses
+        return 0;
+    }
 
     if (isMaximizing) {
         let bestScore = -Infinity;
@@ -102,15 +134,39 @@ function minimax(board, depth, isMaximizing) {
 function checkWinner(b) {
     const wins = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
     for (let combo of wins) {
-        if (b[combo[0]] && b[combo[0]] === b[combo[1]] && b[combo[0]] === b[combo[2]]) 
-            return b[combo[0]];
+        if (b[combo[0]] && b[combo[0]] === b[combo[1]] && b[combo[0]] === b[combo[2]]) {
+            return { winner: b[combo[0]], combo: combo };
+        }
     }
-    return b.includes("") ? null : "draw";
+    return b.includes("") ? null : { winner: "draw" };
 }
 
-function endGame(result) {
-    if (result === "draw") scores.draw++;
-    else if (result === player) scores.user++;
+function drawWinningLine(combo) {
+    const boardRect = boardEl.getBoundingClientRect();
+    const startCell = cells[combo[0]].getBoundingClientRect();
+    const endCell = cells[combo[2]].getBoundingClientRect();
+
+    const x1 = startCell.left + startCell.width / 2 - boardRect.left;
+    const y1 = startCell.top + startCell.height / 2 - boardRect.top;
+    const x2 = endCell.left + endCell.width / 2 - boardRect.left;
+    const y2 = endCell.top + endCell.height / 2 - boardRect.top;
+
+    const dist = Math.hypot(x2 - x1, y2 - y1);
+    const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
+
+    line.style.width = `${dist}px`;
+    line.style.left = `${x1}px`;
+    line.style.top = `${y1}px`;
+    line.style.transform = `rotate(${angle}deg)`;
+    line.style.display = 'block';
+}
+
+function endGame(winnerSymbol) {
+    isAiThinking = true;
+    boardEl.classList.add('locked');
+    
+    if (winnerSymbol === "draw") scores.draw++;
+    else if (winnerSymbol === player) scores.user++;
     else scores.ai++;
     
     document.getElementById('user-score').innerText = scores.user;
